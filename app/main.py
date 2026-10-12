@@ -1,123 +1,90 @@
-import random
-import const
+from app import const
+from app.schedule import create_schedule
+from app.simulate_phase import carry_over_points, simulate_phase
 
-
-# 各チームごとに、強さの重み、Mリーグポイント、試合数を格納する。
-teams = {
-    "チームA": {
-        "weight": 1.0,
-        "point": 0.0,
-        "game_count": 0,
-    },
-    "チームB": {
-        "weight": 1.0,
-        "point": 0.0,
-        "game_count": 0,
-    },
-    "チームC": {
-        "weight": 1.0,
-        "point": 0.0,
-        "game_count": 0,
-    },    
-    "チームD": {
-        "weight": 1.0,
-        "point": 0.0,
-        "game_count": 0,
-    },
-}
-
-
-def game(teams):
-    # 着順を決める
-    temp_teams = teams.copy()
-    ranking = {}
-
-    for rank in range(1, const.PLAYER_COUNT):
-        # 1～3着のチームを決定
-        selected = random.choices(
-            list(temp_teams.keys()), 
-            weights = [team["weight"] for team in temp_teams.values()], 
-            k = 1
-        )[0]
-        ranking[rank] = selected
-        temp_teams.pop(selected)
-
-    # 4着のチームを追加
-    ranking[const.PLAYER_COUNT] = next(iter(temp_teams))
-    # print("順位：", ranking)
-
-    # 得点算出を行う
-    while True:
-        players_score = []
-
-        for _ in range(const.PLAYER_COUNT - 1):
-            # 設定した正規分布に基づいて選手の得点を算出する
-            score = round(
-                random.gauss(const.MEAN_SCORE, const.STANDARD_DEVIATION_SCORE) / const.SCORE_UNIT
-            ) * const.SCORE_UNIT
-            players_score.append(score)
-
-        # 4人目の得点は持ち点の総合計から3人の点数の合計を引いた残りとする
-        players_score.append(const.TOTAL_SCORE - sum(players_score))
-
-        # 得点算出のやり直し条件１：指定の範囲を超えた得点が存在する
-        if any(
-            score < const.MIN_SCORE or const.MAX_SCORE < score
-            for score in players_score
-        ):
-            # print("得点が指定の範囲を超えました")
-            continue
-
-        # 得点算出のやり直し条件２：同じ点数が複数存在する
-        if len(set(players_score)) != const.PLAYER_COUNT:
-            # print("同じ点数が複数発生しました")
-            continue
-
-        # 得点算出のやり直し条件に掛からなかった場合、処理を抜ける
-        break
-
-    # 得点の大きい順に並べ替え
-    players_score = sorted(players_score, reverse=True)
-    # print("得点：", players_score)
-
-    # 得点を素点に変換する
-    base_point = [
-        (val - const.POINT_BASE) / const.POINT_CONVERSION_UNIT
-        for val in players_score
+def main():
+    all_teams = [
+        "Ａチーム",
+        "Ｂチーム",
+        "Ｃチーム",
+        "Ｄチーム",
+        "Ｅチーム",
+        "Ｆチーム",
+        "Ｇチーム",
+        "Ｈチーム",
+        "Ｉチーム",
+        "Ｊチーム",
     ]
-    # print("素点：", base_point)
 
-    # 順位点を加算し、Mリーグポイントを生成する
-    m_league_point = [
-        round(point + const.RANK_POINT[rank], 1)
-        for rank, point in enumerate(base_point, start=1)
-    ]
-    # print("Mリーグポイント：", m_league_point)
-
-    # 順位に対応したチームにMリーグポイントを割り当てる
-    game_result = {
-        team: m_league_point[rank - 1]
-        for rank, team in ranking.items()
+    teams = {
+        name: {
+            "weight": 1.0,
+            "point": 0.0,
+            "regular_end_points": None,
+            "regular_end_rank": None,
+            "semifinal_start_points": None,
+            "semifinal_end_points": None,
+            "semifinal_end_rank": None,
+            "final_start_points": None,
+            "final_end_points": None,
+            "final_end_rank": None,
+        }
+        for name in all_teams
     }
-    # print("試合結果：", game_result)
 
-    return game_result
+    # チームの強さは全チーム同じで対戦チームの影響を受けないため、
+    # 予めスケジュールを作成し、それを全シーズンで行う。
+    regular_schedule = create_schedule(
+        const.REGULAR_GAMES_PER_TEAM, const.REGULAR_TEAMS, teams.keys()
+    )
+
+    # セミファイナルのスケジュールについても、予めデフォルトのチーム名で作成する
+    semifinal_teams_default = [
+        "REGULAR_1",
+        "REGULAR_2",
+        "REGULAR_3",
+        "REGULAR_4",
+        "REGULAR_5",
+        "REGULAR_6",
+    ]
+    semifinal_schedule = create_schedule(
+        const.SEMIFINAL_GAMES_PER_TEAM, const.SEMIFINAL_TEAMS, semifinal_teams_default
+    )
+
+    season_result = {}
+
+    regular_result = simulate_phase(teams, const.REGULAR_PHASE, regular_schedule)
+
+    semifinal_teams = dict(regular_result[:const.SEMIFINAL_TEAMS])
+
+    # セミファイナルのスケジュールをセミファイナル進出チームに置き換える
+    semi_mapping = {
+        f"REGULAR_{rank}": team_name
+        for rank, team_name in enumerate(semifinal_teams, start=1)
+    }
+    semifinal_schedule = [
+        [semi_mapping[team] for team in card] for card in semifinal_schedule
+    ]
+
+    semifinal_teams = carry_over_points(const.SEMIFINAL_PHASE, const.REGULAR_PHASE, semifinal_teams)
+    semifinal_result = simulate_phase(semifinal_teams, const.SEMIFINAL_PHASE, semifinal_schedule)
+
+    final_teams = dict(semifinal_result[:const.FINAL_TEAMS])
+    final_teams = carry_over_points(const.FINAL_PHASE, const.SEMIFINAL_PHASE, final_teams)
+    final_result =simulate_phase(final_teams, const.FINAL_PHASE)
+
+    # 全チームのシーズン成績を集約する
+    season_result.update(dict(final_result))
+    # セミ敗退チームを追加
+    season_result.update(
+        dict(semifinal_result[-(const.SEMIFINAL_TEAMS - const.FINAL_TEAMS):])
+    )
+    # レギュラー敗退チームを追加
+    season_result.update(
+        dict(regular_result[-(const.REGULAR_TEAMS - const.SEMIFINAL_TEAMS):])
+    )
+    return season_result
 
 
-# 指定の半荘数実行する
-for i in range(5):
-    game_result = game(teams)
-
-    for team_name, team_point in game_result.items():
-        teams[team_name]["point"] = round(teams[team_name]["point"] + team_point, 1)
-        teams[team_name]["game_count"] += 1
-    
-print("指定半荘実行結果：", teams)
-
-# Mリーグポイント順にチームを並べ替える
-phase_result = sorted(
-    teams.items(),
-    key=lambda x: x[1]["point"],
-    reverse=True
-)
-print("フェイズ最終順位：", phase_result)
+if __name__ == "__main__":
+    main()

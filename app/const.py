@@ -1,20 +1,24 @@
-# 着順による順位点
-RANK_POINT = {
-    1: 50.0,
-    2: 10.0,
-    3: -10.0,
-    4: -30.0
-}
-
+# --------------------------
+# チーム・スケジュール関係
+# --------------------------
 # 1半荘の人数
 PLAYER_COUNT = 4
+# 1カードで実行する半荘数
+GAMES_PER_CARD = 2
 
-# レギュラーシーズンの試合数
-REGULAR_GAMES = 120
-# セミファイナルの試合数
-SEMIFINAL_GAMES = 20
-# ファイナルの試合数
-FINAL_GAMES = 16
+# レギュラーシーズンラベル
+REGULAR_PHASE = "regular"
+# セミファイナルラベル
+SEMIFINAL_PHASE = "semifinal"
+# ファイナルラベル
+FINAL_PHASE = "final"
+
+# レギュラーシーズンの1チームあたりの半荘数
+REGULAR_GAMES_PER_TEAM = 120
+# セミファイナルの1チームあたりの半荘数
+SEMIFINAL_GAMES_PER_TEAM = 20
+# ファイナルの1チームあたりの半荘数
+FINAL_GAMES_PER_TEAM = 16
 
 # レギュラーシーズンチーム数
 REGULAR_TEAMS = 10
@@ -24,7 +28,13 @@ SEMIFINAL_TEAMS = 6
 FINAL_TEAMS = 4
 
 # Mリーグポイント持越率
-CARRY_RATE = 0.5
+CARRY_OVER_RATE = 0.5
+
+# --------------------------
+# 半荘における点数関係
+# --------------------------
+# 着順による順位点
+RANK_POINT = {1: 50.0, 2: 10.0, 3: -10.0, 4: -30.0}
 
 # 得点の上限と下限
 MAX_SCORE = 120000
@@ -43,7 +53,12 @@ SCORE_UNIT = 100
 # 素点変換用
 POINT_CONVERSION_UNIT = 1000
 # 素点の基準点
-POINT_BASE = 30000
+RETURN_SCORE = 30000
 
-# 直接実行時の半荘数
-DEFAULT_GAME_COUNT = 5
+# --------------------------
+# 動作確認用
+# --------------------------
+# 直接実行時の半荘数（動作確認用）
+DEFAULT_GAME_COUNT = 4
+# 直接実行時のシーズン数（動作確認用）
+DEFAULT_SEASON_COUNT = 10
