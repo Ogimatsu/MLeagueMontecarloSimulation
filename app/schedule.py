@@ -8,13 +8,13 @@ def create_schedule(games_per_team, team_count, team_names):
     scheduled_card_counts = Counter()
 
     # 1チーム当たりの必要なカード数
-    card_per_team = games_per_team // const.GAMES_PER_CARD
+    cards_per_team = games_per_team // const.GAMES_PER_CARD
 
     # 全チームの総カード数
-    card_total = team_count * card_per_team // const.PLAYER_COUNT
+    card_total = team_count * cards_per_team // const.PLAYER_COUNT
 
     # 各チームの残りカード数
-    remaining_cards = {team: card_per_team for team in team_names}
+    remaining_cards = {team: cards_per_team for team in team_names}
 
     schedule = []
 
@@ -40,7 +40,7 @@ def create_schedule(games_per_team, team_count, team_names):
     # １．作成した総カード数でない
     # ２．全チームのカード数が規定数でない
     if len(schedule) != card_total or not all(
-        value == card_per_team for value in scheduled_card_counts.values()
+        value == cards_per_team for value in scheduled_card_counts.values()
     ):
         raise ValueError("不正なスケジュールです")
     return schedule

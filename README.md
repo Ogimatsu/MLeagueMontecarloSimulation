@@ -45,3 +45,15 @@ MLeagueMontecarloSimulation/
 - コミットメッセージはプレフィックス付きで明確に（例：fix:, feat:）
 
 ---
+
+## 主な開発環境上での実行コマンド
+
+- ツールの実行
+```
+python -m app.main
+```
+
+- テストコードの実行
+```
+python -m pytest -s test\test_main.py
+```

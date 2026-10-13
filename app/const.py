@@ -1,6 +1,9 @@
 # --------------------------
 # チーム・スケジュール関係
 # --------------------------
+# 指定シーズン数
+SEASON_COUNT = 10000
+
 # 1半荘の人数
 PLAYER_COUNT = 4
 # 1カードで実行する半荘数
@@ -21,11 +24,11 @@ SEMIFINAL_GAMES_PER_TEAM = 20
 FINAL_GAMES_PER_TEAM = 16
 
 # レギュラーシーズンチーム数
-REGULAR_TEAMS = 10
+REGULAR_TEAM_COUNT = 10
 # セミファイナル進出チーム数
-SEMIFINAL_TEAMS = 6
+SEMIFINAL_TEAM_COUNT = 6
 # ファイナル進出チーム数
-FINAL_TEAMS = 4
+FINAL_TEAM_COUNT = 4
 
 # Mリーグポイント持越率
 CARRY_OVER_RATE = 0.5
@@ -34,7 +37,7 @@ CARRY_OVER_RATE = 0.5
 # 半荘における点数関係
 # --------------------------
 # 着順による順位点
-RANK_POINT = {1: 50.0, 2: 10.0, 3: -10.0, 4: -30.0}
+RANK_POINTS = {1: 50.0, 2: 10.0, 3: -10.0, 4: -30.0}
 
 # 得点の上限と下限
 MAX_SCORE = 120000
@@ -44,9 +47,9 @@ MIN_SCORE = -60000
 TOTAL_SCORE = 100000
 
 # 得点の平均
-MEAN_SCORE = 25000
+SCORE_MEAN = 25000
 # 得点の標準偏差
-STANDARD_DEVIATION_SCORE = 18000
+SCORE_STANDARD_DEVIATION = 18000
 # 得点の最小単位（100点刻み）
 SCORE_UNIT = 100
 
@@ -59,6 +62,6 @@ RETURN_SCORE = 30000
 # 動作確認用
 # --------------------------
 # 直接実行時の半荘数（動作確認用）
-DEFAULT_GAME_COUNT = 4
+DEBUG_GAME_COUNT = 4
 # 直接実行時のシーズン数（動作確認用）
-DEFAULT_SEASON_COUNT = 10
+DEBUG_SEASON_COUNT = 10
