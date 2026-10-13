@@ -4,6 +4,7 @@ from app import const
 
 
 def game(teams: dict):
+    """1半荘を実行し、チームごとのMリーグポイントを返す。"""
     # 着順を決める
     remaining_teams = teams.copy()
     ranking = {}
@@ -30,7 +31,7 @@ def game(teams: dict):
             # 設定した正規分布に基づいて選手の得点を算出する
             score = (
                 round(
-                    random.gauss(const.MEAN_SCORE, const.STANDARD_DEVIATION_SCORE)
+                    random.gauss(const.SCORE_MEAN, const.SCORE_STANDARD_DEVIATION)
                     / const.SCORE_UNIT
                 )
                 * const.SCORE_UNIT
@@ -67,7 +68,7 @@ def game(teams: dict):
 
     # 順位点を加算し、Mリーグポイントを生成する
     m_league_points = [
-        round(point + const.RANK_POINT[rank], 1)
+        round(point + const.RANK_POINTS[rank], 1)
         for rank, point in enumerate(base_points, start=1)
     ]
     # print("Mリーグポイント：", m_league_points)
